@@ -12,8 +12,6 @@ namespace JobBars.Nodes.Gauge.Arrow {
         public readonly SimpleOverlayNode SelectedContainer;
         public readonly ImageNode Selected;
 
-        private ElementColor TickColor = ColorConstants.NoColor;
-
         private bool PrevValue = false;
 
         public ArrowTick() {
@@ -49,17 +47,37 @@ namespace JobBars.Nodes.Gauge.Arrow {
             Selected.AttachNode( SelectedContainer );
 
             AddTimeline( new TimelineBuilder()
-                .BeginFrameSet( 1, 12 ) // Pop in
+                .BeginFrameSet( 1, 10 ) // Pop in id = 1
                 .AddLabel( 1, 1, AtkTimelineJumpBehavior.Start, 0 )
-                .AddLabel( 12, 0, AtkTimelineJumpBehavior.PlayOnce, 0 )
+                .AddLabel( 10, 0, AtkTimelineJumpBehavior.PlayOnce, 0 )
                 .EndFrameSet()
                 .Build()
             );
 
             SelectedContainer.AddTimeline( new TimelineBuilder()
-                .BeginFrameSet( 1, 12 )
+                .BeginFrameSet( 1, 10 )
                 .AddFrame( 1, scale: new Vector2( 2.5f, 2.5f ), alpha: 0, addColor: new Vector3( 80f, 80f, 80f ) )
-                .AddFrame( 12, scale: new Vector2( 1f, 1f ), alpha: 255, addColor: new Vector3( 0f, 0f, 0f ) )
+                .AddFrame( 5, scale: new Vector2( 1f, 1f ), alpha: 255, addColor: new Vector3( 0f, 0f, 0f ) )
+                .EndFrameSet()
+                .Build()
+            );
+
+            SelectedContainer.AddTimeline( new TimelineBuilder()
+                .BeginFrameSet( 1, 46 )
+                .AddLabel( 1, 17, AtkTimelineJumpBehavior.Start, 0 ) // Solid color
+                .AddLabel( 10, 0, AtkTimelineJumpBehavior.PlayOnce, 0 )
+                .AddLabel( 11, 101, AtkTimelineJumpBehavior.Start, 0 ) // Loop
+                .AddLabel( 46, 0, AtkTimelineJumpBehavior.LoopForever, 101 )
+                .EndFrameSet()
+                .Build()
+            );
+
+            Selected.AddTimeline( new TimelineBuilder()
+                .BeginFrameSet( 1, 46 )
+                .AddFrame( 1, addColor: new Vector3( 120f, -50f, -50f ) )
+                .AddFrame( 11, addColor: new Vector3( 120f, -50f, -50f ) )
+                .AddFrame( 17, addColor: new Vector3( 200f, 30f, 30f ) )
+                .AddFrame( 46, addColor: new Vector3( 120f, -50f, -50f ) )
                 .EndFrameSet()
                 .Build()
             );
@@ -67,15 +85,18 @@ namespace JobBars.Nodes.Gauge.Arrow {
 
         public void SetValue( bool value ) {
             Selected.IsVisible = value;
-            if( value && !PrevValue ) {
+            if( value && !PrevValue ) { // Now visible
                 Timeline?.PlayAnimation( 1 ); // Pop in
+                SelectedContainer.Timeline?.PlayAnimation( JobBars.Configuration.GaugePulse ? 101 : 17 ); // Either play pulse or solid color
             }
             PrevValue = value;
         }
 
         public void SetColor( ElementColor color ) {
-            TickColor = color;
-            TickColor.SetColor( Selected );
+            Selected.Timeline?.UpdateKeyFrame( 1, KeyFrameGroupType.Tint, addColor: color.AddColorKeyframe, multiplyColor: color.MultiplyColorKeyframe );
+            Selected.Timeline?.UpdateKeyFrame( 11, KeyFrameGroupType.Tint, addColor: color.AddColorKeyframe, multiplyColor: color.MultiplyColorKeyframe );
+            Selected.Timeline?.UpdateKeyFrame( 17, KeyFrameGroupType.Tint, addColor: color.AddColorKeyframe + new Vector3( 80f, 80f, 80f ), multiplyColor: color.MultiplyColorKeyframe );
+            Selected.Timeline?.UpdateKeyFrame( 46, KeyFrameGroupType.Tint, addColor: color.AddColorKeyframe, multiplyColor: color.MultiplyColorKeyframe );
         }
     }
 }

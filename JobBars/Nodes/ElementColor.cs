@@ -28,7 +28,12 @@ namespace JobBars.Atk {
         }
 
         public readonly Vector3 AddColor => new( AddRed / 255f, AddGreen / 255f, AddBlue / 255f );
+
+        public readonly Vector3 AddColorKeyframe => new( AddRed, AddGreen, AddBlue );
+
         public readonly Vector3 MultiplyColor => new( MultiplyRed / 100f, MultiplyGreen / 100f, MultiplyBlue / 100f );
+
+        public readonly Vector3 MultiplyColorKeyframe => new( MultiplyRed, MultiplyGreen, MultiplyBlue );
 
         public readonly void SetColor( NodeBase node ) {
             node.MultiplyColor = MultiplyColor;
@@ -71,31 +76,18 @@ namespace JobBars.Atk {
             node->MultiplyBlue_2 = multBlue;
         }
 
-        public static unsafe void SetColorPulse( AtkResNode* node, ElementColor color, float percent ) {
-            // 0 = color
-            // 50 = color + 100
-            // 100 = color
-
-            var add = ( short )( 75 * ( 1f - 2f * Math.Abs( percent - 0.5f ) ) ); // 0 -> 1 -> 0
-            var currentRed = ( short )( color.AddRed + add );
-            var currentGreen = ( short )( color.AddGreen + add );
-            var currentBlue = ( short )( color.AddBlue + add );
-
-            SetColor( node, currentRed, currentGreen, currentBlue, color.MultiplyRed, color.MultiplyGreen, color.MultiplyBlue );
-        }
-
         // ======== COLORS ======
         public static readonly ElementColor MpPink = new( "MP Pink", 120, 0, 60, 90, 75, 75 );
         public static readonly ElementColor HealthGreen = new( "Health Green", 20, 75, 0, 80, 80, 40 );
         public static readonly ElementColor Purple = new( "Purple", 50, 0, 150, 80, 75, 80 );
-        public static readonly ElementColor Red = new( "Red", 150, 0, 0, 80, 80, 80 );
+        public static readonly ElementColor Red = new( "Red", 140, 0, 0, 80, 80, 80 );
         public static readonly ElementColor LightBlue = new( "Light Blue", 0, 100, 140, 80, 100, 100 );
         public static readonly ElementColor Orange = new( "Orange", 120, 50, -29, 100, 100, 100 );
         public static readonly ElementColor PurplePink = new( "Purple-Pink", 80, -59, 50, 100, 100, 100 );
         public static readonly ElementColor BlueGreen = new( "Blue-Green", -79, 50, 90, 80, 80, 40 );
         public static readonly ElementColor BrightGreen = new( "Bright Green", -49, 100, 0, 90, 100, 100 );
         public static readonly ElementColor Yellow = new( "Yellow", 130, 100, -19, 100, 100, 100 );
-        public static readonly ElementColor White = new( "White", 150, 140, 140, 100, 100, 100 );
+        public static readonly ElementColor White = new( "White", 140, 140, 140, 100, 100, 100 );
         public static readonly ElementColor DarkBlue = new( "Dark Blue", -19, -19, 120, 100, 100, 100 );
         public static readonly ElementColor NoColor = new( "No Color", 0, 0, 0, 100, 100, 100 );
 

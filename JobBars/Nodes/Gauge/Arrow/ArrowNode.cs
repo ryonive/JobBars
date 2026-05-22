@@ -33,7 +33,7 @@ namespace JobBars.Nodes.Gauge.Arrow {
 
         public void Clear() {
             foreach( var tick in Ticks ) {
-                tick.Selected.IsVisible = false;
+                //tick.Selected.IsVisible = false;
             }
         }
 
