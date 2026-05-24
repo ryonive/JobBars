@@ -20,7 +20,6 @@ namespace JobBars.Nodes.Gauge {
         public readonly List<BarNode> Bars = [];
         public readonly List<ArrowNode> Arrows = [];
         public readonly List<DiamondNode> Diamonds = [];
-        public readonly List<BarDiamondComboNode> BarDiamondCombos = [];
 
         private readonly GaugeManager Manager;
 
@@ -32,7 +31,6 @@ namespace JobBars.Nodes.Gauge {
                 Bars.Add( new BarNode() );
                 Arrows.Add( new ArrowNode() );
                 Diamonds.Add( new DiamondNode() );
-                BarDiamondCombos.Add( new( Bars[^1], Diamonds[^1] ) );
             }
 
             var allGauges = new List<NodeBase>();
@@ -41,26 +39,6 @@ namespace JobBars.Nodes.Gauge {
             allGauges.AddRange( Diamonds );
 
             allGauges.ForEach( x => x.AttachNode( this ) );
-
-            /*foreach( var arrow in Arrows ) {
-                arrow.AddTimeline( new TimelineBuilder()
-                    .BeginFrameSet( 1, 20 ) // Pop in
-                    .AddLabel( 1, 1, AtkTimelineJumpBehavior.Start, 0 )
-                    .AddLabel( 20, 0, AtkTimelineJumpBehavior.LoopForever, 1 )
-                    .EndFrameSet()
-                    .Build()
-                );
-
-                foreach( var tick in arrow.Ticks ) {
-                    tick.Selected.AddTimeline( new TimelineBuilder()
-                        .BeginFrameSet( 1, 20 )
-                        .AddFrame( 1, scale: new Vector2( 20.5f, 20.5f ), alpha: 250, addColor: new Vector3( 80f, 80f, 80f ) )
-                        .AddFrame( 20, scale: new Vector2( 1f, 1f ), alpha: 255, addColor: new Vector3( 0f, 0f, 0f ) )
-                        .EndFrameSet()
-                        .Build()
-                    );
-                }
-            }*/
         }
 
         public void HideAll() {

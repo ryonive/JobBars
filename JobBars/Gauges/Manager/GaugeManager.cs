@@ -5,6 +5,7 @@ using JobBars.Gauges.Types.BarDiamondCombo;
 using JobBars.Gauges.Types.Diamond;
 using JobBars.Helper;
 using JobBars.Nodes.Gauge;
+using JobBars.Nodes.Gauge.BarDiamondCombo;
 using KamiToolKit.Overlay.UiOverlay;
 using System;
 using System.Collections.Generic;
@@ -93,7 +94,9 @@ namespace JobBars.Gauges.Manager {
                 var yOffset = 0;
 
                 // Kind of jank but oh well
-                if( requestedType == GaugeVisualType.Bar && gauge is IGaugeBarInterface barTracker && barIdx <= GaugeRoot.MAX_GAUGES ) {
+                if( requestedType == GaugeVisualType.Bar && gauge is IGaugeBarInterface barTracker
+                    && barIdx <= GaugeRoot.MAX_GAUGES ) {
+
                     var bar = Root.Bars[barIdx];
                     node = bar;
                     bar.Tick( barTracker );
@@ -104,7 +107,9 @@ namespace JobBars.Gauges.Manager {
 
                     barIdx++;
                 }
-                else if( requestedType == GaugeVisualType.Diamond && gauge is IGaugeDiamondInterface diamondTracker && diamondIdx <= GaugeRoot.MAX_GAUGES ) {
+                else if( requestedType == GaugeVisualType.Diamond && gauge is IGaugeDiamondInterface diamondTracker
+                    && diamondIdx <= GaugeRoot.MAX_GAUGES ) {
+
                     var diamond = Root.Diamonds[diamondIdx];
                     node = diamond;
                     diamond.Tick( diamondTracker );
@@ -115,7 +120,9 @@ namespace JobBars.Gauges.Manager {
 
                     diamondIdx++;
                 }
-                else if( requestedType == GaugeVisualType.Arrow && gauge is IGaugeArrowInterface arrowTracker && arrowIdx <= GaugeRoot.MAX_GAUGES ) {
+                else if( requestedType == GaugeVisualType.Arrow && gauge is IGaugeArrowInterface arrowTracker
+                    && arrowIdx <= GaugeRoot.MAX_GAUGES ) {
+
                     var arrow = Root.Arrows[arrowIdx];
                     node = arrow;
                     arrow.Tick( arrowTracker );
@@ -126,8 +133,10 @@ namespace JobBars.Gauges.Manager {
 
                     arrowIdx++;
                 }
-                else if( requestedType == GaugeVisualType.BarDiamondCombo && gauge is IGaugeBarDiamondComboInterface comboTracker && barIdx <= GaugeRoot.MAX_GAUGES ) {
-                    var combo = Root.BarDiamondCombos[barIdx];
+                else if( requestedType == GaugeVisualType.BarDiamondCombo && gauge is IGaugeBarDiamondComboInterface comboTracker
+                    && barIdx <= GaugeRoot.MAX_GAUGES && diamondIdx <= GaugeRoot.MAX_GAUGES ) {
+
+                    var combo = new BarDiamondComboNode( Root.Bars[barIdx], Root.Diamonds[diamondIdx] );
                     node = combo;
                     combo.Tick( comboTracker );
 

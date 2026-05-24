@@ -1,7 +1,5 @@
-using FFXIVClientStructs.FFXIV.Component.GUI;
 using JobBars.Atk;
 using JobBars.Gauges.Types.Arrow;
-using KamiToolKit.Timelines;
 using System.Collections.Generic;
 
 namespace JobBars.Nodes.Gauge.Arrow {
