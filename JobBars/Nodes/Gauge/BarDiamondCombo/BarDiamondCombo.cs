@@ -54,9 +54,7 @@ namespace JobBars.Nodes.Gauge.BarDiamondCombo {
 
         public void SetPercent( float value ) => Bar.SetPercent( value );
 
-        public void Clear() => Diamond.Clear();
-
-        public unsafe void SetSplitPosition( GaugeRoot root, Vector2 pos ) {
+        public void SetSplitPosition( GaugeRoot root, Vector2 pos ) {
             Bar.SetSplitPosition( root, pos );
             Diamond.SetSplitPosition( root, new( pos.X, pos.Y + 10 ) );
         }

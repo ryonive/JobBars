@@ -3,15 +3,18 @@ using JobBars.Atk;
 using KamiToolKit.Enums;
 using KamiToolKit.Nodes;
 using KamiToolKit.Premade.Node.Simple;
+using KamiToolKit.Timelines;
+using System.Numerics;
 
 namespace JobBars.Nodes.Gauge.Diamond {
     public unsafe class DiamondTick : SimpleOverlayNode {
         public readonly ImageNode Background;
-        public readonly SimpleOverlayNode SelectedContainer;
-        public readonly ImageNode Selected;
+        public readonly SimpleOverlayNode Container;
+        public readonly SimpleOverlayNode DiamondContainer;
+        public readonly ImageNode Diamond;
         public readonly TextNode Text;
 
-        private ElementColor TickColor = ColorConstants.NoColor;
+        private bool PrevValue = false;
 
         public DiamondTick() {
             Size = new( 32, 32 );
@@ -25,12 +28,17 @@ namespace JobBars.Nodes.Gauge.Diamond {
                 TexturePath = "ui/uld/JobHudSimple_StackA.tex"
             };
 
-            SelectedContainer = new SimpleOverlayNode() {
+            Container = new SimpleOverlayNode() {
                 Size = new( 32, 32 ),
                 Origin = new( 16, 16 ),
             };
 
-            Selected = new SimpleImageNode() {
+            DiamondContainer = new SimpleOverlayNode() {
+                Size = new( 32, 32 ),
+                Origin = new( 16, 16 ),
+            };
+
+            Diamond = new SimpleImageNode() {
                 Size = new( 32, 32 ),
                 Origin = new( 16, 16 ),
                 TextureCoordinates = new( 32, 0 ),
@@ -52,15 +60,61 @@ namespace JobBars.Nodes.Gauge.Diamond {
             Text.Node->AlignmentFontType = 4;
 
             Background.AttachNode( this );
-            SelectedContainer.AttachNode( this );
+            Container.AttachNode( this );
 
-            Selected.AttachNode( SelectedContainer );
-            Text.AttachNode( SelectedContainer );
+            DiamondContainer.AttachNode( Container );
+            Text.AttachNode( Container );
+            Diamond.AttachNode( DiamondContainer );
+
+            Container.AddTimeline( new TimelineBuilder()
+                .BeginFrameSet( 1, 10 ) // Pop in id = 1
+                .AddLabel( 1, 1, AtkTimelineJumpBehavior.Start, 0 )
+                .AddLabel( 10, 0, AtkTimelineJumpBehavior.PlayOnce, 0 )
+                .EndFrameSet()
+                .Build()
+            );
+
+            DiamondContainer.AddTimeline( new TimelineBuilder()
+                .BeginFrameSet( 1, 10 )
+                .AddFrame( 1, scale: new Vector2( 2.5f, 2.5f ), alpha: 0, addColor: new Vector3( 80f, 80f, 80f ) )
+                .AddFrame( 5, scale: new Vector2( 1f, 1f ), alpha: 255, addColor: new Vector3( 0f, 0f, 0f ) )
+                .EndFrameSet()
+
+                .BeginFrameSet( 1, 46 )
+                .AddLabel( 1, 17, AtkTimelineJumpBehavior.Start, 0 ) // Solid color
+                .AddLabel( 10, 0, AtkTimelineJumpBehavior.PlayOnce, 0 )
+                .AddLabel( 11, 101, AtkTimelineJumpBehavior.Start, 0 ) // Loop
+                .AddLabel( 46, 0, AtkTimelineJumpBehavior.LoopForever, 101 )
+                .EndFrameSet()
+
+                .Build()
+            );
+
+            Diamond.AddTimeline( new TimelineBuilder()
+                .BeginFrameSet( 1, 46 )
+                .AddFrame( 1, addColor: new Vector3( 120f, -50f, -50f ) )
+                .AddFrame( 11, addColor: new Vector3( 120f, -50f, -50f ) )
+                .AddFrame( 17, addColor: new Vector3( 200f, 30f, 30f ) )
+                .AddFrame( 46, addColor: new Vector3( 120f, -50f, -50f ) )
+                .EndFrameSet()
+                .Build()
+            );
+        }
+
+        public void SetValue( bool value ) {
+            Container.IsVisible = value;
+            if( value && !PrevValue ) { // Now visible
+                Container.Timeline?.PlayAnimation( 1 ); // Pop in
+                DiamondContainer.Timeline?.PlayAnimation( JobBars.Configuration.GaugePulse ? 101 : 17 ); // Either play pulse or solid color
+            }
+            PrevValue = value;
         }
 
         public void SetColor( ElementColor color ) {
-            TickColor = color;
-            TickColor.SetColor( Selected );
+            Diamond.Timeline?.UpdateKeyFrame( 1, KeyFrameGroupType.Tint, addColor: color.AddColorKeyframe, multiplyColor: color.MultiplyColorKeyframe );
+            Diamond.Timeline?.UpdateKeyFrame( 11, KeyFrameGroupType.Tint, addColor: color.AddColorKeyframe, multiplyColor: color.MultiplyColorKeyframe );
+            Diamond.Timeline?.UpdateKeyFrame( 17, KeyFrameGroupType.Tint, addColor: color.AddColorKeyframe + new Vector3( 80f, 80f, 80f ), multiplyColor: color.MultiplyColorKeyframe );
+            Diamond.Timeline?.UpdateKeyFrame( 46, KeyFrameGroupType.Tint, addColor: color.AddColorKeyframe, multiplyColor: color.MultiplyColorKeyframe );
         }
     }
 }

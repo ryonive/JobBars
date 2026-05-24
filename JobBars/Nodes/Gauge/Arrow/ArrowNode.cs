@@ -31,12 +31,6 @@ namespace JobBars.Nodes.Gauge.Arrow {
 
         public void SetValue( int idx, bool value ) => Ticks[idx].SetValue( value );
 
-        public void Clear() {
-            foreach( var tick in Ticks ) {
-                //tick.Selected.IsVisible = false;
-            }
-        }
-
         // ====================
 
         public void Tick( IGaugeArrowInterface tracker ) {
@@ -44,7 +38,6 @@ namespace JobBars.Nodes.Gauge.Arrow {
             SetScale( tracker.GetConfig().Scale );
 
             SetMaxValue( tracker.GetTotalMaxTicks() );
-            Clear();
 
             for( var i = 0; i < tracker.GetCurrentMaxTicks(); i++ ) {
                 var trackerIndex = tracker.GetReverseFill() ? ( tracker.GetCurrentMaxTicks() - i - 1 ) : i;

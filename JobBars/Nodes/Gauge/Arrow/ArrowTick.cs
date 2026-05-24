@@ -9,8 +9,8 @@ using System.Numerics;
 namespace JobBars.Nodes.Gauge.Arrow {
     public unsafe class ArrowTick : SimpleOverlayNode {
         public readonly ImageNode Background;
-        public readonly SimpleOverlayNode SelectedContainer;
-        public readonly ImageNode Selected;
+        public readonly SimpleOverlayNode ArrowContainer;
+        public readonly ImageNode Arrow;
 
         private bool PrevValue = false;
 
@@ -26,12 +26,12 @@ namespace JobBars.Nodes.Gauge.Arrow {
                 TexturePath = "ui/uld/JobHudSimple_StackB.tex"
             };
 
-            SelectedContainer = new SimpleOverlayNode() {
+            ArrowContainer = new SimpleOverlayNode() {
                 Size = new( 32, 32 ),
                 Origin = new( 16, 16 ),
             };
 
-            Selected = new SimpleImageNode() {
+            Arrow = new SimpleImageNode() {
                 Size = new( 32, 32 ),
                 Origin = new( 16, 16 ),
                 TextureCoordinates = new( 32, 0 ),
@@ -42,9 +42,9 @@ namespace JobBars.Nodes.Gauge.Arrow {
             };
 
             Background.AttachNode( this );
-            SelectedContainer.AttachNode( this );
+            ArrowContainer.AttachNode( this );
 
-            Selected.AttachNode( SelectedContainer );
+            Arrow.AttachNode( ArrowContainer );
 
             AddTimeline( new TimelineBuilder()
                 .BeginFrameSet( 1, 10 ) // Pop in id = 1
@@ -54,25 +54,23 @@ namespace JobBars.Nodes.Gauge.Arrow {
                 .Build()
             );
 
-            SelectedContainer.AddTimeline( new TimelineBuilder()
+            ArrowContainer.AddTimeline( new TimelineBuilder()
                 .BeginFrameSet( 1, 10 )
                 .AddFrame( 1, scale: new Vector2( 2.5f, 2.5f ), alpha: 0, addColor: new Vector3( 80f, 80f, 80f ) )
                 .AddFrame( 5, scale: new Vector2( 1f, 1f ), alpha: 255, addColor: new Vector3( 0f, 0f, 0f ) )
                 .EndFrameSet()
-                .Build()
-            );
 
-            SelectedContainer.AddTimeline( new TimelineBuilder()
                 .BeginFrameSet( 1, 46 )
                 .AddLabel( 1, 17, AtkTimelineJumpBehavior.Start, 0 ) // Solid color
                 .AddLabel( 10, 0, AtkTimelineJumpBehavior.PlayOnce, 0 )
                 .AddLabel( 11, 101, AtkTimelineJumpBehavior.Start, 0 ) // Loop
                 .AddLabel( 46, 0, AtkTimelineJumpBehavior.LoopForever, 101 )
                 .EndFrameSet()
+
                 .Build()
             );
 
-            Selected.AddTimeline( new TimelineBuilder()
+            Arrow.AddTimeline( new TimelineBuilder()
                 .BeginFrameSet( 1, 46 )
                 .AddFrame( 1, addColor: new Vector3( 120f, -50f, -50f ) )
                 .AddFrame( 11, addColor: new Vector3( 120f, -50f, -50f ) )
@@ -84,19 +82,19 @@ namespace JobBars.Nodes.Gauge.Arrow {
         }
 
         public void SetValue( bool value ) {
-            Selected.IsVisible = value;
+            Arrow.IsVisible = value;
             if( value && !PrevValue ) { // Now visible
                 Timeline?.PlayAnimation( 1 ); // Pop in
-                SelectedContainer.Timeline?.PlayAnimation( JobBars.Configuration.GaugePulse ? 101 : 17 ); // Either play pulse or solid color
+                ArrowContainer.Timeline?.PlayAnimation( JobBars.Configuration.GaugePulse ? 101 : 17 ); // Either play pulse or solid color
             }
             PrevValue = value;
         }
 
         public void SetColor( ElementColor color ) {
-            Selected.Timeline?.UpdateKeyFrame( 1, KeyFrameGroupType.Tint, addColor: color.AddColorKeyframe, multiplyColor: color.MultiplyColorKeyframe );
-            Selected.Timeline?.UpdateKeyFrame( 11, KeyFrameGroupType.Tint, addColor: color.AddColorKeyframe, multiplyColor: color.MultiplyColorKeyframe );
-            Selected.Timeline?.UpdateKeyFrame( 17, KeyFrameGroupType.Tint, addColor: color.AddColorKeyframe + new Vector3( 80f, 80f, 80f ), multiplyColor: color.MultiplyColorKeyframe );
-            Selected.Timeline?.UpdateKeyFrame( 46, KeyFrameGroupType.Tint, addColor: color.AddColorKeyframe, multiplyColor: color.MultiplyColorKeyframe );
+            Arrow.Timeline?.UpdateKeyFrame( 1, KeyFrameGroupType.Tint, addColor: color.AddColorKeyframe, multiplyColor: color.MultiplyColorKeyframe );
+            Arrow.Timeline?.UpdateKeyFrame( 11, KeyFrameGroupType.Tint, addColor: color.AddColorKeyframe, multiplyColor: color.MultiplyColorKeyframe );
+            Arrow.Timeline?.UpdateKeyFrame( 17, KeyFrameGroupType.Tint, addColor: color.AddColorKeyframe + new Vector3( 80f, 80f, 80f ), multiplyColor: color.MultiplyColorKeyframe );
+            Arrow.Timeline?.UpdateKeyFrame( 46, KeyFrameGroupType.Tint, addColor: color.AddColorKeyframe, multiplyColor: color.MultiplyColorKeyframe );
         }
     }
 }

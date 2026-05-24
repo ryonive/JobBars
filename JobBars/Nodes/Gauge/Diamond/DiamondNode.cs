@@ -42,9 +42,7 @@ namespace JobBars.Nodes.Gauge.Diamond {
 
         public void SetColor( int idx, ElementColor color ) => Ticks[idx].SetColor( color );
 
-        public void SetValue( int idx, bool value ) {
-            Ticks[idx].SelectedContainer.IsVisible = value;
-        }
+        public void SetValue( int idx, bool value ) => Ticks[idx].SetValue( value );
 
         public void SetText( int idx, string text ) {
             if( text == null ) return;
@@ -60,10 +58,6 @@ namespace JobBars.Nodes.Gauge.Diamond {
             Ticks[idx].Text.IsVisible = false;
         }
 
-        public void Clear() {
-            for( var idx = 0; idx < MAX_ITEMS; idx++ ) SetValue( idx, false );
-        }
-
         // ====================
 
         public void Tick( IGaugeDiamondInterface tracker ) {
@@ -72,7 +66,6 @@ namespace JobBars.Nodes.Gauge.Diamond {
 
             SetMaxValue( tracker.GetTotalMaxTicks() );
             SetTextVisible( tracker.GetDiamondTextVisible() );
-            Clear();
 
             for( var i = 0; i < tracker.GetCurrentMaxTicks(); i++ ) {
                 var trackerIndex = tracker.GetReverseFill() ? ( tracker.GetCurrentMaxTicks() - i - 1 ) : i;
