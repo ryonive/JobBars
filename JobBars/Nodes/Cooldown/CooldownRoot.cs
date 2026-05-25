@@ -1,13 +1,10 @@
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using JobBars.Cooldowns.Manager;
-using KamiToolKit.Enums;
-using KamiToolKit.Overlay.UiOverlay;
+using KamiToolKit.Premade.Node.Simple;
 using System.Collections.Generic;
 
 namespace JobBars.Nodes.Cooldown {
-    public unsafe class CooldownRoot : OverlayNode {
-        public override OverlayLayer OverlayLayer => OverlayLayer.BehindUserInterface;
-
+    public unsafe class CooldownRoot : SimpleOverlayNode {
         public readonly List<CooldownRow> Rows = [];
 
         public static readonly int MAX_BUFFS = 25;
@@ -34,7 +31,5 @@ namespace JobBars.Nodes.Cooldown {
         }
 
         public void SetCooldownRowVisible( int idx, bool visible ) => Rows[idx].IsVisible = visible;
-
-        protected override void OnUpdate() => Manager.Tick();
     }
 }

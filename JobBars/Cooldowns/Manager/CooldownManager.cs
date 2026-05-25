@@ -1,7 +1,9 @@
+using FFXIVClientStructs.FFXIV.Client.UI;
+using FFXIVClientStructs.FFXIV.Component.GUI;
 using JobBars.Data;
 using JobBars.Helper;
 using JobBars.Nodes.Cooldown;
-using KamiToolKit.Overlay.UiOverlay;
+using KamiToolKit.Controllers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,12 +15,12 @@ namespace JobBars.Cooldowns.Manager {
         public JobIds Job;
     }
 
-    public partial class CooldownManager : PerJobManager<CooldownConfig[]> {
+    public unsafe partial class CooldownManager : PerJobManager<CooldownConfig[]> {
         private static readonly int MILLIS_LOOP = 250;
         private Dictionary<ulong, CooldownPartyMember> ObjectIdToMember = [];
         private readonly Dictionary<JobIds, List<CooldownConfig>> CustomCooldowns = [];
 
-        private OverlayController? Controller;
+        private AddonController<AddonPartyList> Controller;
         private CooldownRoot? Root;
 
         public CooldownManager() : base( "##JobBars_Cooldowns" ) {
@@ -28,11 +30,27 @@ namespace JobBars.Cooldowns.Manager {
                 CustomCooldowns[custom.Job].Add( new CooldownConfig( custom.Name, custom.GetNameId(), custom.Props ) );
             }
 
-            Controller = new();
-            Controller.CreateNode( () => {
-                Root = new( this );
-                return Root;
-            } );
+            Controller = new AddonController<AddonPartyList> {
+                AddonName = "_PartyList",
+                OnSetup = SetupAddon,
+                OnFinalize = ResetAddon,
+                OnUpdate = UpdateAddon
+            };
+            Controller.Enable();
+        }
+
+        private void SetupAddon( AddonPartyList* addon ) {
+            Root = new( this );
+            Root.AttachNode( (AtkUnitBase*)addon );
+        }
+
+        private void ResetAddon( AddonPartyList* addon ) {
+            Root?.Dispose();
+            Root = null;
+        }
+
+        private void UpdateAddon( AddonPartyList* addon ) {
+            Tick();
         }
 
         public void Hide() {
@@ -65,8 +83,7 @@ namespace JobBars.Cooldowns.Manager {
 
             // Visibility
 
-            if( UiHelper.CalcDoHide( JobBars.Configuration.CooldownsEnabled, JobBars.Configuration.CooldownsHideOutOfCombat, JobBars.Configuration.CooldownsHideWeaponSheathed )
-                || !UiHelper.PartyListVisible() ) {
+            if( UiHelper.CalcDoHide( JobBars.Configuration.CooldownsEnabled, JobBars.Configuration.CooldownsHideOutOfCombat, JobBars.Configuration.CooldownsHideWeaponSheathed ) ) {
 
                 Root!.IsVisible = false;
                 return;
@@ -77,7 +94,7 @@ namespace JobBars.Cooldowns.Manager {
 
             // Global position + scale
 
-            Root.Position = JobBars.Configuration.CooldownPosition + UiHelper.PartyListPosition() + new Vector2( 0, UiHelper.PartyListOffset() );
+            Root.Position = JobBars.Configuration.CooldownPosition + new Vector2( 0, UiHelper.PartyListOffset() );
             Root.Scale = new( JobBars.Configuration.CooldownScale, JobBars.Configuration.CooldownScale );
             Root.UpdateSpacing();
 
@@ -91,7 +108,7 @@ namespace JobBars.Cooldowns.Manager {
 
             if( JobBars.PartyMembers == null ) Dalamud.Error( "PartyMembers is null" );
 
-            for( var idx = 0; idx < JobBars.PartyMembers.Count; idx++ ) {
+            for( var idx = 0; idx < JobBars.PartyMembers!.Count; idx++ ) {
                 var partyMember = JobBars.PartyMembers[idx];
 
                 if( partyMember == null || partyMember?.ObjectId == 0 || partyMember?.Job == JobIds.OTHER ) {

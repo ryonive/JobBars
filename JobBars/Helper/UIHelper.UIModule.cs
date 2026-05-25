@@ -31,17 +31,5 @@ namespace JobBars.Helper {
             if( offsetNode == null ) return 0;
             return offsetNode->Y;
         }
-
-        public static Vector2 PartyListPosition() {
-            var partyList = ( AddonPartyList* )GetAddon( "_PartyList" );
-            if( partyList == null || partyList->AtkUnitBase.RootNode == null ) return new( 0, 0 );
-            return partyList->AtkUnitBase.RootNode->Position;
-        }
-
-        public static bool PartyListVisible() {
-            var partyList = ( AddonPartyList* )GetAddon( "_PartyList" );
-            if( partyList == null || partyList->AtkUnitBase.RootNode == null ) return false;
-            return partyList->IsVisible;
-        }
     }
 }
