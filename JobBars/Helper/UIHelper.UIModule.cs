@@ -37,5 +37,11 @@ namespace JobBars.Helper {
             if( partyList == null || partyList->AtkUnitBase.RootNode == null ) return new( 0, 0 );
             return partyList->AtkUnitBase.RootNode->Position;
         }
+
+        public static bool PartyListVisible() {
+            var partyList = ( AddonPartyList* )GetAddon( "_PartyList" );
+            if( partyList == null || partyList->AtkUnitBase.RootNode == null ) return false;
+            return partyList->IsVisible;
+        }
     }
 }

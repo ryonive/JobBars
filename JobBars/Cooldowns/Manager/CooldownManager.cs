@@ -1,8 +1,6 @@
-using FFXIVClientStructs.FFXIV.Component.GUI;
 using JobBars.Data;
 using JobBars.Helper;
 using JobBars.Nodes.Cooldown;
-using KamiToolKit.Controllers;
 using KamiToolKit.Overlay.UiOverlay;
 using System;
 using System.Collections.Generic;
@@ -67,7 +65,9 @@ namespace JobBars.Cooldowns.Manager {
 
             // Visibility
 
-            if( UiHelper.CalcDoHide( JobBars.Configuration.CooldownsEnabled, JobBars.Configuration.CooldownsHideOutOfCombat, JobBars.Configuration.CooldownsHideWeaponSheathed ) ) {
+            if( UiHelper.CalcDoHide( JobBars.Configuration.CooldownsEnabled, JobBars.Configuration.CooldownsHideOutOfCombat, JobBars.Configuration.CooldownsHideWeaponSheathed )
+                || !UiHelper.PartyListVisible() ) {
+
                 Root!.IsVisible = false;
                 return;
             }
