@@ -22,7 +22,11 @@ namespace JobBars.Cursors.Manager {
             OuterColor = ColorConstants.GetColor( JobBars.Configuration.CursorOuterColor, ColorConstants.HealthGreen );
 
             Controller = new();
-            Controller.CreateNode( () => {
+        }
+
+        public void OnLogin() {
+            if( Root != null ) return;
+            Controller!.CreateNode( () => {
                 Root = new( this );
                 return Root;
             } );

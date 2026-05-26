@@ -1,12 +1,8 @@
+using FFXIVClientStructs.FFXIV.Component.GUI;
 using JobBars.Atk;
-using JobBars.Gauges.Types.Arrow;
 using JobBars.Gauges.Types.Diamond;
-using KamiToolKit;
-using KamiToolKit.Classes;
-using KamiToolKit.Nodes;
+using KamiToolKit.Timelines;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 
 namespace JobBars.Nodes.Gauge.Diamond {
     public unsafe class DiamondNode : GaugeNode {
@@ -18,13 +14,19 @@ namespace JobBars.Nodes.Gauge.Diamond {
             Size = new( 160, 46 );
 
             for( var idx = 0; idx < MAX_ITEMS; idx++ ) {
-                var tick = new DiamondTick {
+                var tick = new DiamondTick( this ) {
                     Position = new( 20 * idx, 0 )
                 };
                 Ticks.Add( tick );
             }
 
             Ticks.ForEach( x => x.AttachNode( this ) );
+        }
+
+        public void Sync() {
+            foreach( var tick in Ticks ) {
+                tick.DiamondContainer.Timeline?.PlayAnimation( JobBars.Configuration.GaugePulse ? 101 : 17 ); // Either play pulse or solid color
+            }
         }
 
         public void SetMaxValue( int value ) {

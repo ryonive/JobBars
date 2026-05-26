@@ -7,7 +7,6 @@ using JobBars.Helper;
 using JobBars.Nodes.Gauge;
 using JobBars.Nodes.Gauge.BarDiamondCombo;
 using KamiToolKit.Overlay.UiOverlay;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -25,7 +24,11 @@ namespace JobBars.Gauges.Manager {
 
         public GaugeManager() : base( "##JobBars_Gauges" ) {
             Controller = new();
-            Controller.CreateNode( () => {
+        }
+
+        public void OnLogin() {
+            if( Root != null ) return;
+            Controller!.CreateNode( () => {
                 Root = new( this );
                 return Root;
             } );

@@ -8,6 +8,8 @@ using System.Numerics;
 
 namespace JobBars.Nodes.Gauge.Diamond {
     public unsafe class DiamondTick : SimpleOverlayNode {
+        public readonly DiamondNode Parent;
+
         public readonly ImageNode Background;
         public readonly SimpleOverlayNode Container;
         public readonly SimpleOverlayNode DiamondContainer;
@@ -16,8 +18,9 @@ namespace JobBars.Nodes.Gauge.Diamond {
 
         private bool PrevValue = false;
 
-        public DiamondTick() {
+        public DiamondTick( DiamondNode parent ) {
             Size = new( 32, 32 );
+            Parent = parent;
 
             Background = new SimpleImageNode() {
                 Size = new( 32, 32 ),
@@ -105,7 +108,7 @@ namespace JobBars.Nodes.Gauge.Diamond {
             Container.IsVisible = value;
             if( value && !PrevValue ) { // Now visible
                 Container.Timeline?.PlayAnimation( 1 ); // Pop in
-                DiamondContainer.Timeline?.PlayAnimation( JobBars.Configuration.GaugePulse ? 101 : 17 ); // Either play pulse or solid color
+                Parent.Sync();
             }
             PrevValue = value;
         }

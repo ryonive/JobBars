@@ -4,8 +4,8 @@ using KamiToolKit.Overlay.UiOverlay;
 using System.Collections.Generic;
 
 namespace JobBars.Nodes.Buff {
-    public unsafe class BuffRoot : OverlayNode {
-        public override OverlayLayer OverlayLayer => OverlayLayer.AboveUserInterface;
+    public class BuffRoot : OverlayNode {
+        public override OverlayLayer OverlayLayer => OverlayLayer.BehindUserInterface;
 
         public readonly List<BuffNode> Buffs = [];
 

@@ -7,14 +7,17 @@ using KamiToolKit.Timelines;
 using System.Numerics;
 
 namespace JobBars.Nodes.Gauge.Arrow {
-    public unsafe class ArrowTick : SimpleOverlayNode {
+    public class ArrowTick : SimpleOverlayNode {
+        public readonly ArrowNode Parent;
+
         public readonly ImageNode Background;
         public readonly SimpleOverlayNode ArrowContainer;
         public readonly ImageNode Arrow;
 
         private bool PrevValue = false;
 
-        public ArrowTick() {
+        public ArrowTick( ArrowNode parent ) {
+            Parent = parent;
             Size = new( 32, 32 );
 
             Background = new SimpleImageNode() {
@@ -85,7 +88,7 @@ namespace JobBars.Nodes.Gauge.Arrow {
             Arrow.IsVisible = value;
             if( value && !PrevValue ) { // Now visible
                 Timeline?.PlayAnimation( 1 ); // Pop in
-                ArrowContainer.Timeline?.PlayAnimation( JobBars.Configuration.GaugePulse ? 101 : 17 ); // Either play pulse or solid color
+                Parent.Sync();
             }
             PrevValue = value;
         }

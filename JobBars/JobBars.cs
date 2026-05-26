@@ -14,13 +14,13 @@ using KamiToolKit;
 using System;
 
 namespace JobBars {
-    public unsafe partial class JobBars : IDalamudPlugin {
+    public partial class JobBars : IDalamudPlugin {
         public static Configuration Configuration { get; private set; }
-        public static GaugeManager GaugeManager { get; private set; }
-        public static BuffManager BuffManager { get; private set; }
-        public static CooldownManager CooldownManager { get; private set; }
-        public static CursorManager CursorManager { get; private set; }
-        public static IconManager IconManager { get; private set; }
+        public static GaugeManager? GaugeManager { get; private set; }
+        public static BuffManager? BuffManager { get; private set; }
+        public static CooldownManager? CooldownManager { get; private set; }
+        public static CursorManager? CursorManager { get; private set; }
+        public static IconManager? IconManager { get; private set; }
 
         public static JobIds CurrentJob { get; private set; } = JobIds.OTHER;
 
@@ -51,16 +51,18 @@ namespace JobBars {
             ReceiveActionEffectHook.Enable();
             ActorControlSelfHook.Enable();
 
+            Dalamud.PluginInterface.UiBuilder.Draw += BuildSettingsUi;
+            Dalamud.PluginInterface.UiBuilder.OpenMainUi += OpenConfig;
+            Dalamud.PluginInterface.UiBuilder.OpenConfigUi += OpenConfig;
+            SetupCommands();
+
             BuffManager = new BuffManager();
             CooldownManager = new CooldownManager();
             GaugeManager = new GaugeManager();
             CursorManager = new CursorManager();
             IconManager = new IconManager();
-
-            Dalamud.PluginInterface.UiBuilder.Draw += BuildSettingsUi;
-            Dalamud.PluginInterface.UiBuilder.OpenMainUi += OpenConfig;
-            Dalamud.PluginInterface.UiBuilder.OpenConfigUi += OpenConfig;
-            SetupCommands();
+            Dalamud.ClientState.Login += OnLogin;
+            if( Dalamud.ClientState.IsLoggedIn ) OnLogin();
 
             Dalamud.Framework.Update += OnFrameworkUpdate;
             Dalamud.ClientState.Logout += OnLogout;
@@ -79,6 +81,7 @@ namespace JobBars {
 
             Dalamud.Framework.Update -= OnFrameworkUpdate;
             Dalamud.ClientState.Logout -= OnLogout;
+            Dalamud.ClientState.Login -= OnLogin;
             Dalamud.ClientState.TerritoryChanged -= OnZoneChange;
 
             Animation.Dispose();
@@ -110,7 +113,14 @@ namespace JobBars {
             CheckForJobChange();
             UpdatePartyMembers();
 
-            IconManager.Tick();
+            IconManager?.Tick();
+        }
+
+        // So we don't load textures before Penumbra
+        private void OnLogin() {
+            GaugeManager?.OnLogin();
+            BuffManager?.OnLogin();
+            CursorManager?.OnLogin();
         }
 
         private void OnLogout( int type, int code ) {
@@ -127,14 +137,13 @@ namespace JobBars {
         }
 
         private static void CheckForJobChange() {
-            var job = UiHelper.IdToJob( Dalamud.Objects.LocalPlayer.ClassJob.RowId );
+            var job = UiHelper.IdToJob( Dalamud.Objects.LocalPlayer?.ClassJob.RowId ?? 0 );
             if( job != CurrentJob ) {
                 CurrentJob = job;
                 Dalamud.Log( $"SWITCHED JOB TO {CurrentJob}" );
-                GaugeManager.SetJob( CurrentJob );
-                CursorManager.SetJob( CurrentJob );
-                IconManager.SetJob( CurrentJob );
-                // CD?
+                GaugeManager?.SetJob( CurrentJob );
+                CursorManager?.SetJob( CurrentJob );
+                IconManager?.SetJob( CurrentJob );
             }
         }
 

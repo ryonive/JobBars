@@ -1,15 +1,11 @@
-using FFXIVClientStructs.FFXIV.Component.GUI;
 using JobBars.Gauges.Manager;
 using JobBars.Nodes.Gauge.Arrow;
 using JobBars.Nodes.Gauge.Bar;
-using JobBars.Nodes.Gauge.BarDiamondCombo;
 using JobBars.Nodes.Gauge.Diamond;
 using KamiToolKit;
 using KamiToolKit.Enums;
 using KamiToolKit.Overlay.UiOverlay;
-using KamiToolKit.Timelines;
 using System.Collections.Generic;
-using System.Numerics;
 
 namespace JobBars.Nodes.Gauge {
     public class GaugeRoot : OverlayNode {

@@ -26,10 +26,6 @@ namespace JobBars.Buffs.Manager {
             ApplyToTargetBuffs.AddRange( [.. JobToValue.Values.SelectMany( x => x.Where( y => y.ApplyToTarget ) )] );
 
             Controller = new();
-            Controller.CreateNode( () => {
-                Root = new( this );
-                return Root;
-            } );
 
             PartyListController = new AddonController {
                 AddonName = "_PartyList",
@@ -37,6 +33,14 @@ namespace JobBars.Buffs.Manager {
                 OnFinalize = ResetPartyList,
             };
             PartyListController.Enable();
+        }
+
+        public void OnLogin() {
+            if( Root != null ) return;
+            Controller!.CreateNode( () => {
+                Root = new( this );
+                return Root;
+            } );
         }
 
         public void Hide() {

@@ -1,5 +1,7 @@
+using FFXIVClientStructs.FFXIV.Component.GUI;
 using JobBars.Atk;
 using JobBars.Gauges.Types.Arrow;
+using KamiToolKit.Timelines;
 using System.Collections.Generic;
 
 namespace JobBars.Nodes.Gauge.Arrow {
@@ -12,7 +14,7 @@ namespace JobBars.Nodes.Gauge.Arrow {
             Size = new( 160, 46 );
 
             for( var idx = 0; idx < MAX_ITEMS; idx++ ) {
-                var tick = new ArrowTick {
+                var tick = new ArrowTick( this ) {
                     Position = new( 18 * idx, 0 )
                 };
                 Ticks.Add( tick );
@@ -28,6 +30,12 @@ namespace JobBars.Nodes.Gauge.Arrow {
         public void SetColor( int idx, ElementColor color ) => Ticks[idx].SetColor( color );
 
         public void SetValue( int idx, bool value ) => Ticks[idx].SetValue( value );
+
+        public void Sync() {
+            foreach( var tick in Ticks ) {
+                tick.ArrowContainer.Timeline?.PlayAnimation( JobBars.Configuration.GaugePulse ? 101 : 17 ); // Either play pulse or solid color
+            }
+        }
 
         // ====================
 
